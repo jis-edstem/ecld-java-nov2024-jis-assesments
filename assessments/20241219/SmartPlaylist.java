@@ -14,6 +14,16 @@ class Track {
         this.isPremium = isPremium;
     }
 
+    @Override
+    public String toString() {
+        return "Track{" +
+                "trackId=" + trackId +
+                ", title='" + title + '\'' +
+                ", rating=" + rating +
+                ", isPremium=" + isPremium +
+                '}';
+    }
+
     public Long getTrackId() {
         return trackId;
     }
@@ -65,6 +75,10 @@ class TrackIterator implements Iterator<Track> {
     }
 }
 
+/**
+ * SmartPlaylist class manages a collection of tracks, allowing for adding, removing, moving, shuffling, and updating ratings of tracks.
+ */
+
 class SmartPlaylist implements PlaylistManager {
     private final List<Track> currentQueue;
     private final List<Track> playedTracks;
@@ -99,16 +113,19 @@ class SmartPlaylist implements PlaylistManager {
     }
 
     public void updateRating(Long trackId, Integer newRating) {
-        for (Track track : currentQueue) {
-            if(track.getTrackId().equals(trackId)) {
-                track.setRating(newRating);
-                return;
-            }
-        }
-        throw new NoSuchElementException("Track with ID " + trackId + " not found");
+        currentQueue.stream()
+                .filter(track -> track.getTrackId().equals(trackId))
+                .findFirst()
+                .ifPresent(track -> track.setRating(newRating));
     }
 
     public List<Track> getCurrentQueue() {
         return currentQueue;
+    }
+
+    public class TrackNotFoundException extends RuntimeException {
+        public TrackNotFoundException(String message) {
+            super(message);
+        }
     }
 }
